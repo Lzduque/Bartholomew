@@ -6,13 +6,19 @@ RH_RF69 rf69;
 unsigned long previousMillis = 0;
 int redLedState = LOW;
 
+enum settings
+{
+	TIMEOUT_ACK = 500
+};
+
 enum states
 {
 	IDLE,
 	NEED_YOU_NOW,
 	NEED_YOU_IN_A_BIT,
 	LOVE_YOU,
-	ACKNOWLEDGED
+	OK,
+	ERROR
 };
 
 enum states state;
@@ -39,7 +45,8 @@ enum colors
 const char NEED_YOU_NOW_MSG[] = "need you now";
 const char NEED_YOU_IN_A_BIT_MSG[] = "need you in a bit";
 const char LOVE_YOU_MSG[] = "love you";
-const char ACK_MSG[] = "ok";
+const char OK_MSG[] = "ok";
+const char ACK_MSG[] = "ack";
 
 void setupRF() {
 	Serial.println("INIT");
@@ -166,6 +173,23 @@ void flashGreen() {
 	delay(500);
 }
 
+void flashError() {
+	setLight(RED);
+	delay(500);
+	turnLightsOff();
+	delay(500);
+	setLight(RED);
+	delay(500);
+	turnLightsOff();
+	delay(500);
+}
+
+void sendAck() {
+	rf69.send(ACK_MSG, sizeof(ACK_MSG));
+	rf69.waitPacketSent();
+	Serial.println("Sent ACK message");
+}
+
 void listeningForMsg() {
 	if (rf69.available()) {
 		// Should be a message for us now   
@@ -176,30 +200,39 @@ void listeningForMsg() {
 		//      RH_RF69::printBuffer("request: ", buf, len);
 			Serial.print("got request: ");
 			Serial.println((char*)buf);
-			Serial.println(NEED_YOU_NOW_MSG);
-			Serial.println(sizeof(NEED_YOU_NOW_MSG));
 
 			if (strncmp(buf, NEED_YOU_NOW_MSG, sizeof(NEED_YOU_NOW_MSG)) == 0) {
 				state = NEED_YOU_NOW;
-			} else if (strncmp(buf, NEED_YOU_IN_A_BIT_MSG, sizeof(NEED_YOU_IN_A_BIT_MSG)) == 0) {
+				sendAck();
+			}
+			else if (strncmp(buf, NEED_YOU_IN_A_BIT_MSG, sizeof(NEED_YOU_IN_A_BIT_MSG)) == 0)
+			{
 				state = NEED_YOU_IN_A_BIT;
-			} else if (strncmp(buf, LOVE_YOU_MSG, sizeof(LOVE_YOU_MSG)) == 0) {
+				sendAck();
+			}
+			else if (strncmp(buf, LOVE_YOU_MSG, sizeof(LOVE_YOU_MSG)) == 0)
+			{
 				state = LOVE_YOU;
-			} else if (strncmp(buf, ACK_MSG, sizeof(ACK_MSG)) == 0) {
-				state = ACKNOWLEDGED;
+				sendAck();
+			}
+			else if (strncmp(buf, OK_MSG, sizeof(OK_MSG)) == 0)
+			{
+				state = OK;
+				sendAck();
 			}
 			Serial.print("RSSI: ");
 			Serial.println(rf69.lastRssi(), DEC);
 		} else {
+			state = ERROR;
 			Serial.println("recv failed");
 		}
 	}
 }
 
-void clickAck() {
+void clickOk() {
 	if (checkClick(BUTTON_NOW_PIN) || checkClick(BUTTON_BIT_PIN) || checkClick(BUTTON_LOVE_PIN)) {
-		Serial.println("Ack button Pressed");
-		rf69.send(ACK_MSG, sizeof(ACK_MSG));
+		Serial.println("OK button Pressed");
+		rf69.send(OK_MSG, sizeof(OK_MSG));
 		rf69.waitPacketSent();
 		Serial.println("Sent a message");
 		state = IDLE;
@@ -207,11 +240,31 @@ void clickAck() {
 	}
 }
 
+void recvfromAckTimeout() {
+    unsigned long starttime = millis();
+    while ((TIMEOUT_ACK - (millis() - starttime)) > 0)
+	{
+		if (rf69.available()) {
+			// Should be a message for us now   
+			uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
+			uint8_t len = sizeof(buf);
+
+			if (rf69.recv(buf, &len)) {
+				if (strncmp(buf, ACK_MSG, sizeof(ACK_MSG)) == 0) {
+					return;
+				}
+			}
+		}
+	} 
+    state = ERROR;
+}
+
 void clickHandling() {
 	if (checkClick(BUTTON_NOW_PIN)) {
 		Serial.println("Button Pressed");
 		rf69.send(NEED_YOU_NOW_MSG, sizeof(NEED_YOU_NOW_MSG));
 		rf69.waitPacketSent();
+		recvfromAckTimeout();
 		Serial.println("Sent a message");
 		while (checkClick(BUTTON_NOW_PIN))
 			;
@@ -219,6 +272,7 @@ void clickHandling() {
 		Serial.println("Button Pressed");
 		rf69.send(NEED_YOU_IN_A_BIT_MSG, sizeof(NEED_YOU_IN_A_BIT_MSG));
 		rf69.waitPacketSent();
+		recvfromAckTimeout();
 		Serial.println("Sent a message");
 		while (checkClick(BUTTON_BIT_PIN))
 			;
@@ -226,6 +280,7 @@ void clickHandling() {
 		Serial.println("Button Pressed");
 		rf69.send(LOVE_YOU_MSG, sizeof(LOVE_YOU_MSG));
 		rf69.waitPacketSent();
+		recvfromAckTimeout();
 		Serial.println("Sent a message");
 		while (checkClick(BUTTON_LOVE_PIN))
 			;
@@ -242,19 +297,23 @@ void loop() {
 		case NEED_YOU_NOW:
 			flashRed();
 			listeningForMsg();
-			clickAck();
+			clickOk();
 			break;
 		case NEED_YOU_IN_A_BIT:
 			flashYellow();
 			listeningForMsg();
-			clickAck();
+			clickOk();
 			break;
 		case LOVE_YOU:
 			flashPurple();
 			state = IDLE;
 			break;
-		case ACKNOWLEDGED:
+		case OK:
 			flashGreen();
+			state = IDLE;
+			break;
+		case ERROR:
+			flashError();
 			state = IDLE;
 			break;
 		default:
