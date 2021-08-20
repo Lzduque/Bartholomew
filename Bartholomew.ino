@@ -326,24 +326,28 @@ void listeningForMsg() {
 			if (strncmp(buf, NEED_YOU_NOW_MSG, sizeof(NEED_YOU_NOW_MSG)) == 0) {
 				state = NEED_YOU_NOW;
 				sendAck();
+				setLight(RED);
 				playNeedYouNow();
 			}
 			else if (strncmp(buf, NEED_YOU_IN_A_BIT_MSG, sizeof(NEED_YOU_IN_A_BIT_MSG)) == 0)
 			{
 				state = NEED_YOU_IN_A_BIT;
 				sendAck();
+				setLight(YELLOW);
 				playNeedYouBit();
 			}
 			else if (strncmp(buf, LOVE_YOU_MSG, sizeof(LOVE_YOU_MSG)) == 0)
 			{
 				state = LOVE_YOU;
 				sendAck();
+				setLight(PURPLE);
 				playLoveYou();
 			}
 			else if (strncmp(buf, OK_MSG, sizeof(OK_MSG)) == 0)
 			{
 				state = OK;
 				sendAck();
+				setLight(GREEN);
 				playOK();
 			}
 			Serial.print("RSSI: ");
