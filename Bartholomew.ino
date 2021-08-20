@@ -201,7 +201,7 @@ void playIntro() {
 	// note durations: 4 = quarter note, 8 = eighth note, etc.:
 	int noteDurations[] = {4, 8, 8, 4, 4, 4, 4, 4};
 
-	for (int thisNote = 0; thisNote < 8; thisNote++) {
+	for (int thisNote = 0; thisNote < sizeof(melody)/sizeof(melody[0]); thisNote++) {
 		// to calculate the note duration, take one second divided by the note type.
 		//e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
 		int noteDuration = 1000 / noteDurations[thisNote];
@@ -219,11 +219,11 @@ void playIntro() {
 
 void playNeedYouNow() {
 	// notes in the melody:
-	int melody[] = {NOTE_G3, NOTE_G3, NOTE_G3, NOTE_G3, 0, NOTE_G3, NOTE_G3, NOTE_G3, NOTE_G3, 0, NOTE_G3, NOTE_C3, NOTE_C3, NOTE_C3, 0, NOTE_C3, NOTE_C3, NOTE_C3, NOTE_C3};
+	int melody[] = {NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, 0, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4, 0, NOTE_G4, NOTE_C4, NOTE_C4, NOTE_C4, 0, NOTE_C4, NOTE_C4, NOTE_C4, NOTE_C4};
 	// note durations: 4 = quarter note, 8 = eighth note, etc.:
-	int noteDurations[] = {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8};
+	int noteDurations[] = {16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16};
 
-	for (int thisNote = 0; thisNote < 19; thisNote++) {
+	for (int thisNote = 0; thisNote < sizeof(melody)/sizeof(melody[0]); thisNote++) {
 		// to calculate the note duration, take one second divided by the note type.
 		//e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
 		int noteDuration = 1000 / noteDurations[thisNote];
@@ -242,12 +242,12 @@ void playNeedYouNow() {
 void playNeedYouBit() {
 	// notes in the melody:
 	int melody[] = {
-		NOTE_D4, NOTE_C4, NOTE_B3, NOTE_C4, NOTE_D4, NOTE_D4, NOTE_C4
+		NOTE_B7, NOTE_A7, NOTE_G7, NOTE_F7, NOTE_E7, NOTE_D7, NOTE_C7, NOTE_B6, NOTE_A6, NOTE_G6, NOTE_F6, NOTE_E6, NOTE_D6, NOTE_C6, NOTE_B5
 		};
 	// note durations: 4 = quarter note, 8 = eighth note, etc.:
-	int noteDurations[] = {8, 8, 4, 4, 4, 8, 8};
+	int noteDurations[] = {32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32};
 
-	for (int thisNote = 0; thisNote < 7; thisNote++) {
+	for (int thisNote = 0; thisNote < sizeof(melody)/sizeof(melody[0]); thisNote++) {
 		// to calculate the note duration, take one second divided by the note type.
 		//e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
 		int noteDuration = 1000 / noteDurations[thisNote];
@@ -266,12 +266,13 @@ void playNeedYouBit() {
 void playLoveYou() {
 	// notes in the melody:
 	int melody[] = {
-		NOTE_F3, NOTE_A3, NOTE_C4, NOTE_F3, NOTE_A3, NOTE_C4, NOTE_F3, NOTE_A3, NOTE_C4, NOTE_F3, NOTE_A3, NOTE_C4
+		NOTE_E7, NOTE_G7, NOTE_B7, NOTE_D8, NOTE_G7, NOTE_B7,
+		NOTE_E7, NOTE_G7, NOTE_B7, NOTE_D8, NOTE_G7, NOTE_B7
 	};
 	// note durations: 4 = quarter note, 8 = eighth note, etc.:
-	int noteDurations[] = {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4};
+	int noteDurations[] = {16, 16, 16, 16, 16, 2, 16, 16, 16, 16, 16, 2};
 
-	for (int thisNote = 0; thisNote < 12; thisNote++) {
+	for (int thisNote = 0; thisNote < sizeof(melody)/sizeof(melody[0]); thisNote++) {
 		// to calculate the note duration, take one second divided by the note type.
 		//e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
 		int noteDuration = 1000 / noteDurations[thisNote];
@@ -290,12 +291,12 @@ void playLoveYou() {
 void playOK() {
 	// notes in the melody:
 	int melody[] = {
-		NOTE_C4, NOTE_C4
+		NOTE_F5, NOTE_D5
 	};
 	// note durations: 4 = quarter note, 8 = eighth note, etc.:
-	int noteDurations[] = {4, 4};
+	int noteDurations[] = {8, 8};
 
-	for (int thisNote = 0; thisNote < 2; thisNote++) {
+	for (int thisNote = 0; thisNote < sizeof(melody)/sizeof(melody[0]); thisNote++) {
 		// to calculate the note duration, take one second divided by the note type.
 		//e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
 		int noteDuration = 1000 / noteDurations[thisNote];
